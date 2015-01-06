@@ -14,7 +14,7 @@ import Data.Maybe (fromJust, isJust)
 import Data.Time (fromGregorian, LocalTime(..), TimeOfDay(..), formatTime, defaultTimeLocale)
 
 import Data.Word
-import System.Directory (renameFile, doesFileExist, createDirectoryIfMissing)
+import System.Directory (copyFile, removeFile, doesFileExist, createDirectoryIfMissing)
 
 
 digits :: Int -> Parser Int
@@ -53,7 +53,9 @@ tryMove fin fout n suffix = do
         then do
             print $ "file " ++ outfile ++ " already exists; incrementing suffix."
             tryMove fin fout (n+1) suffix
-        else renameFile fin outfile
+        else do
+            copyFile fin outfile
+            removeFile fin
 
 
 moveImage :: String -> String -> IO ()
@@ -67,9 +69,9 @@ moveImage fname dir = do
             return ()
 
         Just ts -> do
-            let outfolder = ((++) dir . formatTime defaultTimeLocale "/%0Y/%m") ts
+            let outfolder = ((++) dir . formatTime defaultTimeLocale "/%0Y/%0Y-%m") ts
             createDirectoryIfMissing True outfolder
-            tryMove fname (outfolder ++ formatTime defaultTimeLocale "/%d-%H.%M.%S" ts) 0 suff
+            tryMove fname (outfolder ++ formatTime defaultTimeLocale "/%0Y-%m-%d-%H.%M.%S" ts) 0 suff
 
 
 
