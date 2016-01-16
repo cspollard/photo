@@ -16,8 +16,9 @@ byteOrder = (string "II" *> return II) <|>
 
 data IFD = IFD deriving Show
 
-ifds :: Parser [IFD]
-ifds = return [IFD]
+ifds :: Int -> BSL.ByteString -> [IFD]
+ifds 0 = []
+ifds addr = 
 
 data Header = Header ByteOrder [IFD] deriving Show
 
